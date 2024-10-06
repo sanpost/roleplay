@@ -16,7 +16,7 @@ export default NextAuth({
             console.log("signIn callback triggered");
             const db = await pool.getConnection();
             try {
-                const { email, name } = user;
+                const { email, name } = user;  // Include `name` to handle username
                 console.log("User details:", { email, name });
 
                 const [rows]: [any[], any] = await db.execute(
@@ -25,19 +25,40 @@ export default NextAuth({
                 );
                 console.log("Database query result:", rows);
 
+                let username = name; // Start with the user's Google name
+                let usernameExists = true;
+                let attempt = 1;
+
+                // Check for username uniqueness
+                while (usernameExists) {
+                    const [usernameCheck]: [any[], any] = await db.execute(
+                        "SELECT * FROM users WHERE username = ?",
+                        [username]
+                    );
+
+                    if (usernameCheck.length === 0) {
+                        usernameExists = false;  // Found a unique username
+                    } else {
+                        // Username already exists, modify it
+                        username = `${name}_${attempt}`;
+                        attempt++;
+                    }
+                }
+
                 if (rows.length > 0) {
-                    // Użytkownik już istnieje, aktualizujemy dane
+                    // User already exists, update their Google ID
                     console.log("User exists, updating data");
-                    await db.execute("UPDATE users SET google_id = ? WHERE email = ?", [
+                    await db.execute("UPDATE users SET google_id = ?, username = ? WHERE email = ?", [
                         user.id,
+                        username,
                         email,
                     ]);
                 } else {
-                    // Użytkownik nie istnieje, dodajemy nowego
+                    // User does not exist, insert new user
                     console.log("User does not exist, inserting new user");
                     await db.execute(
                         "INSERT INTO users (google_id, username, email, created_at) VALUES (?, ?, ?, ?)",
-                        [user.id, name, email, new Date()]
+                        [user.id, username, email, new Date()]
                     );
                 }
                 return true;
