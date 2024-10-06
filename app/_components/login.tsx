@@ -31,7 +31,7 @@ export default function Login() {
         <button
           onClick={() => handleSignIn()}
           type="button"
-          className="bg-blue-500 px-4 py-2 rounded-sm text-white"
+          className="bg-stone-600 px-4 py-2 rounded-lg text-white shadow-md"
         >
           Sign In with Google
         </button>
