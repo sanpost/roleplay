@@ -19,7 +19,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        pacifico: ["Pacifico", "system-ui"]
+        pacifico: ["Pacifico", "cursive"]
       },
       colors: {
         border: "hsl(var(--border))",
