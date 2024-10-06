@@ -19,10 +19,17 @@ export default function Login() {
       </>
     );
   } else {
+    const handleSignIn = () => {
+        signIn('google', {
+          callbackUrl: 'http://localhost:3000/board',
+          prompt: 'select_account'
+        });
+      };
+
     return (
       <>
         <button
-          onClick={() => signIn()}
+          onClick={() => handleSignIn()}
           type="button"
           className="bg-blue-500 px-4 py-2 rounded-sm text-white"
         >
