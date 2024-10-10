@@ -7,7 +7,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       className="h-screen w-full items-center flex flex-col justify-between bg-amber-950/30"
     >
       <Navbar />
-      <div className="flex flex-grow w-full bg-white px-32">{children}</div>
+      <div className="flex flex-grow bg-white/30 m-auto w-4/5 p-3">{children}</div>
       <Footer />
     </div>
   );

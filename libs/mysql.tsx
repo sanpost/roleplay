@@ -8,4 +8,4 @@ const pool = mysql.createPool({
     waitForConnections: true
 })
 
-export default pool
+export default pool;
