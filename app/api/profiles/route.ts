@@ -4,7 +4,7 @@ import pool from "@/libs/mysql";
 export async function GET() {
     try {
         const db = await pool.getConnection()
-        const query = 'select * from users'
+        const query = 'select * from profiles'
         const [rows] = await db.execute(query)
         db.release()
         

@@ -11,8 +11,8 @@ export default function DashboardBoard() {
   }
 
   return (
-    <div>
-      <h1>Dashboard</h1>
+    <div className="w-full">
+      <h1 className="text-center text-2xl">Welcome to your Profile Panel</h1>
       <p>Witaj, {session?.user?.name}</p>
       {/* Zawartość dashboardu */}
     </div>

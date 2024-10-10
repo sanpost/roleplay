@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import pool from "@/app/libs/mysql";
+import pool from "@/libs/mysql";
 
 // Initialize NextAuth
 export default NextAuth({
@@ -61,6 +61,17 @@ export default NextAuth({
                         [user.id, username, email, new Date()]
                     );
                 }
+
+                const [profiles]: [any[], any] = await db.execute(
+                    "SELECT * FROM profiles WHERE user_id = ?",
+                    [user.id]
+                );
+
+                if (profiles.length > 0) {
+                    
+                }
+
+
                 return true;
             } catch (error) {
                 console.error("Error in signIn callback:", error);

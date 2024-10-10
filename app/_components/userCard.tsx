@@ -1,7 +1,5 @@
 import { DefaultSession } from "next-auth";
 
-// Default Session TYPE
-
 export function UserCard( { user } : { user: DefaultSession["user"]}) {
     
     return (
