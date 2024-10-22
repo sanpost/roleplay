@@ -1,4 +1,8 @@
-// prisma/schema.prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -8,7 +12,6 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
 
 model User {
   id        Int      @id @default(autoincrement()) // Unikalny identyfikator
@@ -34,7 +37,7 @@ model Profile {
   user User @relation(fields: [user_id], references: [id]) // Relacja z użytkownikiem
 }
 
-model Preferences {
+model Preference {
   id        Int      @id @default(autoincrement())
   name      String   @unique // Unikalna nazwa preferencji
 }
@@ -50,7 +53,7 @@ model Gender {
   name      String   @unique // Unikalna nazwa relacji
 }
 
-model Age_range {
+model AgeRange {
   id        Int      @id @default(autoincrement())
   name      String   @unique // Unikalna nazwa relacji
 }

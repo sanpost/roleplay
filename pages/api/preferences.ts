@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      const preferences = await prisma.preferences.findMany();
+      const preferences = await prisma.preference.findMany();
       return res.status(200).json(preferences.map(pref => pref.name));
     } catch (error) {
       console.error(error);

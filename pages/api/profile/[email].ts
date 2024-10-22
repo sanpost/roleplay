@@ -30,8 +30,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       // Fetch lists of preferences, age ranges, relationships, and genders
-      const preferences = await prisma.preferences.findMany();
-      const ageRanges = await prisma.age_range.findMany();
+      const preferences = await prisma.preference.findMany();
+      const ageRanges = await prisma.ageRange.findMany();
       const relationships = await prisma.relationship.findMany();
       const genders = await prisma.gender.findMany();
       const contactMethod = await prisma.contactMethod.findMany();

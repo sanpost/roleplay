@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
-      const ageRanges = await prisma.age_range.findMany();
+      const ageRanges = await prisma.ageRange.findMany();
       return res.status(200).json(ageRanges.map(range => range.name));
     } catch (error) {
       console.error(error);
