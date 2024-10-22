@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'PUT') {
-    const { email, username, bio, age, preferences, ageRange, relationship, gender } = req.body;
+    const { email, username, bio, age, preferences, ageRange, relationship, gender, contactMethod } = req.body;
 
     // Validate the incoming data
     if (!email || !username) {
@@ -35,6 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           age_range: ageRange,
           relationship,
           gender,
+          contact_methods: contactMethod,
         },
       });
 

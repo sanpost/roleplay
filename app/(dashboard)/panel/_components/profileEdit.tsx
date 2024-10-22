@@ -13,6 +13,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
     ageRange: "",
     relationship: "",
     gender: "",
+    contactMethod: "",
   });
 
   const [options, setOptions] = useState({
@@ -20,6 +21,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
     ageRangeList: [] as string[],
     relationshipList: [] as string[],
     genderList: [] as string[],
+    contactMethodList: [] as string[],
   });
 
   useEffect(() => {
@@ -38,6 +40,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
             ageRange: profile?.age_range || "",
             relationship: profile?.relationship || "",
             gender: profile?.gender || "",
+            contactMethod: profile?.contact_methods || "",
           });
 
           setOptions({
@@ -45,6 +48,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
             ageRangeList: data.ageRanges.map((range: any) => range.name),
             relationshipList: data.relationships.map((rel: any) => rel.name),
             genderList: data.genders.map((gen: any) => gen.name),
+            contactMethodList: data.contactMethod.map((method: any) => method.name),
           });
         } else {
           console.error("Error fetching profile data:", data.message);
@@ -198,6 +202,12 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
             "gender",
             formData.gender,
             options.genderList
+          )}
+          {renderSelect(
+            "Contact Method",
+            "contactMethod",
+            formData.contactMethod,
+            options.contactMethodList
           )}
           <button
             type="submit"

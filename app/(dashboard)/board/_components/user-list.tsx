@@ -11,6 +11,7 @@ interface User {
   relationship: string;
   age_range: string;
   gender: string;
+  contact_methods: string;
 }
 
 interface UserListProps {
@@ -72,6 +73,7 @@ export default function UserList({ users }: UserListProps) {
               Age Range: {selectedUser?.age_range}
             </p>
             <p className="text-gray-600">Gender: {selectedUser?.gender}</p>
+            <p className="text-gray-600"> Contact with Me: {selectedUser?.contact_methods} </p>
             <button
               className="mt-4 bg-blue-500 text-white rounded-lg px-4 py-2"
               onClick={closeModal}

@@ -34,6 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const ageRanges = await prisma.age_range.findMany();
       const relationships = await prisma.relationship.findMany();
       const genders = await prisma.gender.findMany();
+      const contactMethod = await prisma.contactMethod.findMany();
 
       return res.status(200).json({
         user: {
@@ -45,6 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ageRanges,
         relationships,
         genders,
+        contactMethod,
       });
     } catch (error) {
       console.error('Error fetching profile data:', error);
