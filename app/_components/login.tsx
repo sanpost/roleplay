@@ -28,15 +28,22 @@ export default function Login() {
     };
 
     return (
-      <>
+      <div className="space-x-3">
         <button
           onClick={handleSignIn}
           type="button"
           className="bg-stone-600 px-4 py-2 rounded-lg text-white shadow-md"
         >
-          Sign In with Google
+          Login
         </button>
-      </>
+        <button
+          onClick={handleSignIn}
+          type="button"
+          className="bg-stone-100 px-4 py-2 rounded-lg text-stone-700 shadow-md"
+        >
+          Register with Google
+        </button>
+      </div>
     );
   }
 }

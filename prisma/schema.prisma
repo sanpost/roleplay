@@ -29,6 +29,7 @@ model Profile {
   age_range      String?  // Opcjonalny zakres wiekowy
   relationship   String?  // Opcjonalny status związku
   gender         String?  // Opcjonalna płeć
+  contact_methods String?      // Opcjonalne formy kontaktu
 
   user User @relation(fields: [user_id], references: [id]) // Relacja z użytkownikiem
 }
@@ -52,4 +53,9 @@ model Gender {
 model Age_range {
   id        Int      @id @default(autoincrement())
   name      String   @unique // Unikalna nazwa relacji
+}
+
+model ContactMethod {
+  id    Int    @id @default(autoincrement())
+  name  String @unique // Unikalna nazwa metody kontaktu
 }
