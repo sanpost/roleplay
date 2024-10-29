@@ -24,29 +24,64 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Fetch associated data using user_id
+      // Fetch user's profile data
       const profile = await prisma.profile.findUnique({
         where: { user_id: user.id },
       });
 
-      // Fetch lists of preferences, age ranges, relationships, and genders
+      // Fetch user's preferences, age ranges, relationships, and contact methods using relational tables
+      const userPreferences = await prisma.userPreference.findMany({
+        where: { profile_id: profile?.id },
+        select: { preference_id: true },
+      });
+
+      const userAgeRanges = await prisma.userAgeRange.findMany({
+        where: { profile_id: profile?.id },
+        select: { age_range_id: true },
+      });
+
+      const userRelationships = await prisma.userRelationship.findMany({
+        where: { profile_id: profile?.id },
+        select: { relationship_id: true },
+      });
+
+      const userContactMethods = await prisma.userContactMethod.findMany({
+        where: { profile_id: profile?.id },
+        select: { contact_method_id: true },
+      });
+
+      // Fetch lists of preferences, age ranges, relationships, genders, and contact methods
       const preferences = await prisma.preference.findMany();
       const ageRanges = await prisma.ageRange.findMany();
       const relationships = await prisma.relationship.findMany();
       const genders = await prisma.gender.findMany();
-      const contactMethod = await prisma.contactMethod.findMany();
+      const contactMethods = await prisma.contactMethod.findMany();
+
+      // Extract IDs from user-specific tables
+      const preferenceIds = userPreferences.map(up => up.preference_id);
+      const ageRangeIds = userAgeRanges.map(uar => uar.age_range_id);
+      const relationshipIds = userRelationships.map(ur => ur.relationship_id);
+      const contactMethodIds = userContactMethods.map(ucm => ucm.contact_method_id);
 
       return res.status(200).json({
         user: {
           username: user.username,
           email: user.email,
-          profile: profile || {}, // Ensure profile exists
+          profile: {
+            bio: profile?.bio || "",
+            age: profile?.age,
+            gender: profile?.gender,
+            preferences: preferenceIds,
+            age_range: ageRangeIds,
+            relationship: relationshipIds,
+            contact_methods: contactMethodIds,
+          },
         },
         preferences,
         ageRanges,
         relationships,
         genders,
-        contactMethod,
+        contactMethods,
       });
     } catch (error) {
       console.error('Error fetching profile data:', error);

@@ -1,16 +1,31 @@
 import { useState, useEffect } from 'react';
 
+interface Preference {
+  id: number;
+  name: string;
+}
+
+interface Relationship {
+  id: number;
+  name: string;
+}
+
+interface AgeRange {
+  id: number;
+  name: string;
+}
+
 interface SearchFormProps {
   onSearch: (searchData: any) => void;
 }
 
 export default function SearchForm({ onSearch }: SearchFormProps) {
-  const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
-  const [selectedRelationships, setSelectedRelationships] = useState<string[]>([]);
-  const [selectedAgeRanges, setSelectedAgeRanges] = useState<string[]>([]);
-  const [availablePreferences, setAvailablePreferences] = useState<string[]>([]);
-  const [availableRelationships, setAvailableRelationships] = useState<string[]>([]);
-  const [availableAgeRanges, setAvailableAgeRanges] = useState<string[]>([]);
+  const [selectedPreferences, setSelectedPreferences] = useState<number[]>([]);
+  const [selectedRelationships, setSelectedRelationships] = useState<number[]>([]);
+  const [selectedAgeRanges, setSelectedAgeRanges] = useState<number[]>([]);
+  const [availablePreferences, setAvailablePreferences] = useState<Preference[]>([]);
+  const [availableRelationships, setAvailableRelationships] = useState<Relationship[]>([]);
+  const [availableAgeRanges, setAvailableAgeRanges] = useState<AgeRange[]>([]);
 
   // Fetch options from the API
   useEffect(() => {
@@ -37,46 +52,38 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
     fetchData();
   }, []);
 
-  // Toggle preferences selection
-  const togglePreference = (preference: string) => {
+  const togglePreference = (preferenceId: number) => {
     setSelectedPreferences((prev) =>
-      prev.includes(preference)
-        ? prev.filter((p) => p !== preference)
-        : [...prev, preference]
+      prev.includes(preferenceId)
+        ? prev.filter((id) => id !== preferenceId)
+        : [...prev, preferenceId]
     );
   };
 
-  // Toggle relationships selection
-  const toggleRelationship = (relationship: string) => {
+  const toggleRelationship = (relationshipId: number) => {
     setSelectedRelationships((prev) =>
-      prev.includes(relationship)
-        ? prev.filter((r) => r !== relationship)
-        : [...prev, relationship]
+      prev.includes(relationshipId)
+        ? prev.filter((id) => id !== relationshipId)
+        : [...prev, relationshipId]
     );
   };
 
-  // Toggle age ranges selection
-  const toggleAgeRange = (ageRange: string) => {
+  const toggleAgeRange = (ageRangeId: number) => {
     setSelectedAgeRanges((prev) =>
-      prev.includes(ageRange)
-        ? prev.filter((a) => a !== ageRange)
-        : [...prev, ageRange]
+      prev.includes(ageRangeId)
+        ? prev.filter((id) => id !== ageRangeId)
+        : [...prev, ageRangeId]
     );
   };
 
   const handleSearch = () => {
-    console.log("Selected Preferences:", selectedPreferences);
-    console.log("Selected Relationships:", selectedRelationships);
-    console.log("Selected Age Ranges:", selectedAgeRanges);
-  
     onSearch({
       preferences: selectedPreferences,
-      relationships: selectedRelationships, // Używaj poprawnej zmiennej
-      ageRanges: selectedAgeRanges, // Używaj poprawnej zmiennej
+      relationships: selectedRelationships,
+      ageRanges: selectedAgeRanges,
     });
   };
   
-
   return (
     <div className="p-4">
       {/* Preferences Selection */}
@@ -85,13 +92,13 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
         <div className="flex flex-wrap">
           {availablePreferences.map((pref) => (
             <button
-              key={pref}
-              onClick={() => togglePreference(pref)}
+              key={pref.id}
+              onClick={() => togglePreference(pref.id)}
               className={`text-sm m-1 px-4 py-2 rounded text-white ${
-                selectedPreferences.includes(pref) ? 'bg-[#462B20]' : 'bg-[#714733]'
+                selectedPreferences.includes(pref.id) ? 'bg-[#462B20]' : 'bg-[#714733]'
               } transition duration-300`}
             >
-              {pref}
+              {pref.name}
             </button>
           ))}
         </div>
@@ -103,13 +110,13 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
         <div className="flex flex-wrap">
           {availableRelationships.map((rel) => (
             <button
-              key={rel}
-              onClick={() => toggleRelationship(rel)}
+              key={rel.id}
+              onClick={() => toggleRelationship(rel.id)}
               className={`text-sm m-1 px-4 py-2 rounded text-white ${
-                selectedRelationships.includes(rel) ? 'bg-[#543327]' : 'bg-[#8D563F]'
+                selectedRelationships.includes(rel.id) ? 'bg-[#543327]' : 'bg-[#8D563F]'
               } transition duration-300`}
             >
-              {rel}
+              {rel.name}
             </button>
           ))}
         </div>
@@ -121,13 +128,13 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
         <div className="flex flex-wrap">
           {availableAgeRanges.map((ageRange) => (
             <button
-              key={ageRange}
-              onClick={() => toggleAgeRange(ageRange)}
+              key={ageRange.id}
+              onClick={() => toggleAgeRange(ageRange.id)}
               className={`text-sm m-1 px-4 py-2 rounded text-white ${
-                selectedAgeRanges.includes(ageRange) ? 'bg-[#623B2D]' : 'bg-[#A9684C]'
+                selectedAgeRanges.includes(ageRange.id) ? 'bg-[#623B2D]' : 'bg-[#A9684C]'
               } transition duration-300`}
             >
-              {ageRange}
+              {ageRange.name}
             </button>
           ))}
         </div>

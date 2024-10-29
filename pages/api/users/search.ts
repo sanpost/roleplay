@@ -10,32 +10,77 @@ export default async function handler(
   if (req.method === "POST") {
     const { preferences, relationships, ageRanges } = req.body;
 
+    console.log("Incoming request data:", { preferences, relationships, ageRanges });
+
     try {
-      // Budowanie dynamicznej tablicy warunków
-      const conditions = [];
+      const conditions: any[] = [];
 
-      // Dodaj warunek dla preferencji, jeśli są wybrane
+      // Zagnieżdżone warunki dla każdego z filtrów:
       if (preferences && preferences.length > 0) {
-        conditions.push({ preferences: { in: preferences } });
+        conditions.push({
+          preferences: {
+            some: {
+              preference_id: { in: preferences },
+            },
+          },
+        });
+        console.log("Preferences condition added.");
       }
 
-      // Dodaj warunek dla relacji, jeśli jest wybrana
       if (relationships && relationships.length > 0) {
-        conditions.push({ relationship: { in: relationships } });
+        conditions.push({
+          relationships: {
+            some: {
+              relationship_id: { in: relationships },
+            },
+          },
+        });
+        console.log("Relationships condition added.");
       }
 
-      // Dodaj warunek dla zakresu wieku, jeśli jest wybrany
       if (ageRanges && ageRanges.length > 0) {
-        conditions.push({ age_range: { in: ageRanges } });
+        conditions.push({
+          ageRanges: {
+            some: {
+              age_range_id: { in: ageRanges },
+            },
+          },
+        });
+        console.log("Age ranges condition added.");
       }
 
-      // Użyj `AND` zbudowanej tablicy warunków, jeśli są jakieś warunki do zastosowania
+      // Log final conditions for query
+      console.log("Final conditions for query:", conditions);
+
+      // Wyszukiwanie profili z dopasowanymi warunkami
       const users = await prisma.profile.findMany({
-        where: conditions.length > 0 ? { AND: conditions } : {}, // Jeżeli nie ma warunków, zwróć pusty obiekt
+        where: conditions.length > 0 ? { AND: conditions } : {},
         include: {
-          user: true, // Łączenie z tabelą User, by mieć dostęp do nazw użytkowników
+          user: true, // Dołącz dane użytkownika
+          preferences: {
+            include: {
+              preference: true,
+            },
+          },
+          relationships: {
+            include: {
+              relationship: true,
+            },
+          },
+          ageRanges: {
+            include: {
+              ageRange: true,
+            },
+          },
+          contactMethods: {
+            include: {
+              contactMethod: true,
+            },
+          },
         },
       });
+
+      console.log("Users retrieved from database:", users);
 
       res.status(200).json(users);
     } catch (error) {

@@ -7,11 +7,11 @@ interface User {
   };
   bio: string;
   age: number;
-  preferences: string;
-  relationship: string;
-  age_range: string;
+  preferences: string[]; // Tablica stringów
+  relationships: string[]; // Tablica stringów
+  ageRanges: string[]; // Tablica stringów
   gender: string;
-  contact_methods: string;
+  contact_methods: string[]; // Tablica stringów
 }
 
 interface UserListProps {
@@ -32,7 +32,7 @@ export default function UserList({ users }: UserListProps) {
     setSelectedUser(null);
   };
 
-  if (users.length === 0) {
+  if (!Array.isArray(users) || users.length === 0) {
     return <p className="text-center text-gray-500">No users found.</p>;
   }
 
@@ -55,25 +55,27 @@ export default function UserList({ users }: UserListProps) {
       ))}
 
       {/* Modal */}
-      {isModalOpen && (
+      {isModalOpen && selectedUser && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
             <h2 className="text-xl font-semibold text-gray-800">
-              {selectedUser?.user.username}
+              {selectedUser.user.username}
             </h2>
-            <p className="text-gray-600">Bio: {selectedUser?.bio}</p>
-            <p className="text-gray-600">Age: {selectedUser?.age}</p>
+            <p className="text-gray-600">Bio: {selectedUser.bio}</p>
+            <p className="text-gray-600">Age: {selectedUser.age}</p>
+            <p className="text-gray-600">Gender: {selectedUser.gender}</p>
             <p className="text-gray-600">
-              Preferences: {selectedUser?.preferences}
+              Preferences: {selectedUser.preferences?.join(", ") || "None"}
             </p>
             <p className="text-gray-600">
-              Relationship: {selectedUser?.relationship}
+              Relationships: {selectedUser.relationships?.join(", ") || "None"}
             </p>
             <p className="text-gray-600">
-              Age Range: {selectedUser?.age_range}
+              Age Ranges: {selectedUser.ageRanges?.join(", ") || "None"}
             </p>
-            <p className="text-gray-600">Gender: {selectedUser?.gender}</p>
-            <p className="text-gray-600"> Contact with Me: {selectedUser?.contact_methods} </p>
+            <p className="text-gray-600">
+              Contact with Me: {selectedUser.contact_methods?.join(", ") || "None"}
+            </p>
             <button
               className="mt-4 bg-blue-500 text-white rounded-lg px-4 py-2"
               onClick={closeModal}

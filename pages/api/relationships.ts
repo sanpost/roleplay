@@ -1,3 +1,4 @@
+// pages/api/relationship.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 
@@ -7,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     try {
       const relationships = await prisma.relationship.findMany();
-      return res.status(200).json(relationships.map(rel => rel.name));
+      return res.status(200).json(relationships); // Zwracamy pełne obiekty z id i name
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Error fetching relationships' });
