@@ -85,10 +85,10 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
   };
   
   return (
-    <div className="p-4">
+    <div className="px-4">
       {/* Preferences Selection */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-2">Preferences</h3>
+      <div className="mb-2">
+        <h3 className="text-lg font-semibold mb-1">Preferences</h3>
         <div className="flex flex-wrap">
           {availablePreferences.map((pref) => (
             <button
@@ -105,8 +105,8 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       </div>
 
       {/* Relationship Selection */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-2">Relationship</h3>
+      <div className="mb-2">
+        <h3 className="text-lg font-semibold mb-1">Relationship</h3>
         <div className="flex flex-wrap">
           {availableRelationships.map((rel) => (
             <button
@@ -123,8 +123,8 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       </div>
 
       {/* Age Range Selection */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold mb-2">Age Range</h3>
+      <div className="mb-2">
+        <h3 className="text-lg font-semibold mb-1">Age Range</h3>
         <div className="flex flex-wrap">
           {availableAgeRanges.map((ageRange) => (
             <button

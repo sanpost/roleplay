@@ -9,14 +9,13 @@ export const Navbar = () => {
     router.push("/board");
   };
   return (
-    <nav className="top-0 px-4 w-full h-14 flex items-center">
+    <nav className="fixed top-0 left-0 w-full h-14 flex items-center bg-neutral-50 shadow-md z-10 ">
       <button
         onClick={handleBoard}
-        className="flex items-center text-2xl text-neutral-800 -ml-4 pl-20 pr-8 bg-neutral-50 rounded-r-full font-pacifico py-2"
-      >
+        className="flex items-center text-2xl text-neutral-800 -ml-4 pl-20 pr-8 rounded-r-full font-pacifico py-2">
         RolePlay
       </button>
-      <div className="ml-auto flex">
+      <div className="ml-auto flex pr-4">
         <Login />
       </div>
     </nav>

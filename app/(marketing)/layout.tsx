@@ -11,7 +11,7 @@ const MarketingLayout = ({ children }: { children: React.ReactNode }) => {
   if (!session) {
     return (
       <div
-        className="h-screen w-full bg-cover items-center flex flex-col justify-between"
+        className="h-screen w-full bg-cover items-center flex flex-col justify-center"
         style={{ backgroundImage: "url('/wallpaper.jpg')" }}
       >
         <Navbar />

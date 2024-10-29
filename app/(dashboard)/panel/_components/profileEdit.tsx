@@ -11,10 +11,10 @@ interface FormData {
   bio: string;
   age: number | undefined;
   gender: string;
-  ageRange: number[];         // Should be an array of numbers (IDs)
-  relationship: number[];     // Should be an array of numbers (IDs)
-  contactMethod: number[];    // Should be an array of numbers (IDs)
-  preferences: number[];       // Should be an array of numbers (IDs)
+  ageRange: number[]; // Should be an array of numbers (IDs)
+  relationship: number[]; // Should be an array of numbers (IDs)
+  contactMethod: number[]; // Should be an array of numbers (IDs)
+  preferences: number[]; // Should be an array of numbers (IDs)
 }
 
 const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
@@ -42,17 +42,15 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
       try {
         const response = await fetch(`/api/profile/${email}`);
         const data = await response.json();
-    
-        console.log(data); // Debugging line
-    
+
         if (response.ok) {
           const { username, profile } = data.user;
-    
+
           const preferencesIds = profile.preferences || [];
           const ageRangeIds = profile.age_range || [];
           const relationshipIds = profile.relationship || [];
           const contactMethodIds = profile.contact_methods || [];
-    
+
           setFormData({
             username,
             bio: profile?.bio || "",
@@ -63,12 +61,24 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
             contactMethod: contactMethodIds,
             preferences: preferencesIds,
           });
-    
+
           setOptions({
-            ageRangeList: data.ageRanges.map((range: any) => ({ id: range.id, name: range.name })),
-            relationshipList: data.relationships.map((rel: any) => ({ id: rel.id, name: rel.name })),
-            contactMethodList: data.contactMethods.map((method: any) => ({ id: method.id, name: method.name })),
-            preferencesList: data.preferences.map((pref: any) => ({ id: pref.id, name: pref.name })),
+            ageRangeList: data.ageRanges.map((range: any) => ({
+              id: range.id,
+              name: range.name,
+            })),
+            relationshipList: data.relationships.map((rel: any) => ({
+              id: rel.id,
+              name: rel.name,
+            })),
+            contactMethodList: data.contactMethods.map((method: any) => ({
+              id: method.id,
+              name: method.name,
+            })),
+            preferencesList: data.preferences.map((pref: any) => ({
+              id: pref.id,
+              name: pref.name,
+            })),
             genderList: data.genders.map((gen: any) => gen.name),
           });
         } else {
@@ -77,18 +87,17 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-    };    
+    };
 
     fetchData();
   }, [email]);
-  
 
   const handleCheckboxChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: keyof FormData
   ) => {
     const { value, checked } = e.target;
-    const id = Number(value); 
+    const id = Number(value);
 
     setFormData((prev) => ({
       ...prev,
@@ -99,9 +108,12 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -110,7 +122,20 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
+    // Walidacja wieku
+    if ((formData.age ?? 0) < 16 || (formData.age ?? 0) > 120) {
+      toast.error("Age must be between 16 and 120!");
+      return; // Zatrzymuje dalszą logikę
+    }
+
+    // Walidacja biografii
+    const bioRegex = /[<>\/\\\[\]{}();]/; // Prosta walidacja na niebezpieczne znaki
+    if (bioRegex.test(formData.bio)) {
+      toast.error("Bio contains invalid characters!");
+      return; // Zatrzymuje dalszą logikę
+    }
+
     const response = await fetch("/api/profile/edit", {
       method: "PUT",
       headers: {
@@ -128,7 +153,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
         gender: formData.gender,
       }),
     });
-  
+
     if (response.ok) {
       toast.success("Profile updated successfully!");
     } else {
@@ -153,7 +178,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
               name={name}
               value={option.id}
               checked={selectedValues.includes(option.id)} // Check if the option is selected
-              onChange={(e) => handleCheckboxChange(e, name)} 
+              onChange={(e) => handleCheckboxChange(e, name)}
               className="form-checkbox text-indigo-600"
             />
             <span className="ml-2">{option.name}</span>
@@ -163,72 +188,115 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
     </div>
   );
 
-
   return (
     <>
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col max-w-full mx-auto p-6 bg-white shadow-md rounded-lg"
+        className="flex flex-col max-w-full mx-auto p-6 bg-white shadow-xl rounded-lg"
       >
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            required
-          />
+        <div className="flex">
+          {/* Użycie flex dla kolumn pionowych */}
+          {/* Pierwsza kolumna */}
+          <div className="flex flex-col w-1/3 pr-4">
+            <div className="mb-4">
+              <p className="block text-xl font-medium text-gray-700">
+                Username: {formData.username}
+              </p>
+              {/* Tylko tekst nazwy użytkownika */}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Bio
+              </label>
+              <textarea
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                className="mt-1 p-2 block w-full border border-gray-500 rounded-md shadow-sm focus:border-indigo-600 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                rows={4}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Age
+              </label>
+              <input
+                type="number"
+                name="age"
+                value={formData.age || ""}
+                onChange={handleChange}
+                className="mt-1 p-2 block w-full border border-gray-500 rounded-md shadow-sm focus:border-indigo-600 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Gender
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="mt-1 p-2 block w-full border border-gray-500 rounded-md shadow-sm focus:border-indigo-600 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              >
+                <option value="">Select Gender</option>
+                {options.genderList.map((gender, index) => (
+                  <option key={index} value={gender}>
+                    {gender}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              {renderCheckboxGroup(
+                "Contact Methods",
+                "contactMethod",
+                formData.contactMethod,
+                options.contactMethodList
+              )}
+            </div>
+          </div>
+
+          {/* Druga kolumna */}
+          <div className="flex flex-col w-1/3 pl-4">
+            <div>
+              {renderCheckboxGroup(
+                "Preferences",
+                "preferences",
+                formData.preferences,
+                options.preferencesList
+              )}
+            </div>
+          </div>
+
+          {/* Trzecia kolumna */}
+          <div className="flex flex-col w-1/3 pl-4">
+            <div>
+              {renderCheckboxGroup(
+                "Age Ranges",
+                "ageRange",
+                formData.ageRange,
+                options.ageRangeList
+              )}
+            </div>
+            <div>
+              {renderCheckboxGroup(
+                "Relationships",
+                "relationship",
+                formData.relationship,
+                options.relationshipList
+              )}
+            </div>
+          </div>
         </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Bio</label>
-          <textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            rows={4}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Age</label>
-          <input
-            type="number"
-            name="age"
-            value={formData.age || ""}
-            onChange={handleChange}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Gender</label>
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          >
-            <option value="">Select Gender</option>
-            {options.genderList.map((gender) => (
-              <option key={gender} value={gender}>
-                {gender}
-              </option>
-            ))}
-          </select>
-        </div>
-        {renderCheckboxGroup("Preferences", "preferences", formData.preferences, options.preferencesList)}
-        {renderCheckboxGroup("Age Ranges", "ageRange", formData.ageRange, options.ageRangeList)}
-        {renderCheckboxGroup("Relationships", "relationship", formData.relationship, options.relationshipList)}
-        {renderCheckboxGroup("Contact Methods", "contactMethod", formData.contactMethod, options.contactMethodList)}
+
         <button
           type="submit"
-          className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
+          className="mt-4 px-4 py-2 bg-orange-950/80 text-white rounded-md hover:bg-orange-950/90 focus:outline-none focus:ring-2 focus:ring-orange-950 focus:ring-opacity-50"
         >
           Update Profile
         </button>
       </form>
-      <ToastContainer />
+      <ToastContainer position="bottom-right" autoClose={5000} />
     </>
   );
 };

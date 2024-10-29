@@ -12,6 +12,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: 'Email and username are required' });
     }
 
+    // Sanitize bio to prevent SQL Injection and other harmful scripts
+    const bioRegex = /[<>\/\\\[\]{}();]/; // Simple regex to find dangerous characters
+    if (bioRegex.test(bio)) {
+      return res.status(400).json({ message: 'Bio contains invalid characters!' });
+    }
+
     // Optional fields
     const ageAsInt = age ? parseInt(age, 10) : null;
 
