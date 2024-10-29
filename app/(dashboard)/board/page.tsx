@@ -5,10 +5,26 @@ import 'react-toastify/dist/ReactToastify.css';
 import SearchForm from "./_components/form-search";
 import UserList from "./_components/user-list";
 
-export default function CatalogPage() {
-  const [users, setUsers] = useState([]);
+// Define the User interface
+interface User {
+  id: number;
+  user: {
+    username: string;
+  };
+  bio: string;
+  age: number;
+  gender: string;
+  preferences: string[]; 
+  relationships: string[];
+  ageRanges: string[];
+  contact_methods: string[];
+}
 
-  const handleSearch = async (searchData: any): Promise<any[]> => {
+export default function CatalogPage() {
+  // Specify the type of users as User[]
+  const [users, setUsers] = useState<User[]>([]);
+
+  const handleSearch = async (searchData: any): Promise<User[]> => {
     try {
       const response = await fetch("/api/users/search", {
         method: "POST",
@@ -21,7 +37,7 @@ export default function CatalogPage() {
       const data = await response.json();
       setUsers(data);
 
-      // Sprawdzenie, czy użytkownicy zostali znalezieni
+      // Check if users were found
       if (!searchData.preferences.length && !searchData.relationships.length && !searchData.ageRanges.length) {
         toast.info("Nie wybrano kategorii – wyświetlono wszystkich użytkowników.");
       } else if (data.length > 0) {
@@ -30,12 +46,19 @@ export default function CatalogPage() {
         toast.warn("Brak pasujących użytkowników na podstawie wybranych kategorii.");
       }
       
-      return data; // Dodanie zwracania wyników jako tablica
+      return data; 
     } catch (error) {
       console.error("Error searching users:", error);
       toast.error("Wystąpił błąd podczas wyszukiwania. Spróbuj ponownie.");
-      return []; // W przypadku błędu zwracamy pustą tablicę
+      return []; 
     }
+  };
+
+  const handleRandomUser = (user: User) => {
+    setUsers([]);
+    // Add random user to the users list
+    setUsers((prevUsers) => [...prevUsers, user]);
+    toast.success(`Wylosowano użytkownika: ${user.user.username}`);
   };
 
   return (
@@ -45,7 +68,7 @@ export default function CatalogPage() {
       <div className="flex flex-row h-full w-full overflow-hidden">
         <div className="xl:w-1/2 w-3/5 flex-shrink-0 overflow-auto">
           <div className="sticky top-0 z-10">
-            <SearchForm onSearch={handleSearch} />
+            <SearchForm onSearch={handleSearch} onRandomUser={handleRandomUser} />
           </div>
         </div>
         <div className="xl:w-1/2 w-2/5 h-full overflow-auto mt-2">

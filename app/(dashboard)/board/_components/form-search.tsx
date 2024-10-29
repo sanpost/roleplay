@@ -17,9 +17,10 @@ interface AgeRange {
 
 interface SearchFormProps {
   onSearch: (searchData: any) => void;
+  onRandomUser: (user: any) => void; // Nowa funkcja do obsługi losowania użytkownika
 }
 
-export default function SearchForm({ onSearch }: SearchFormProps) {
+export default function SearchForm({ onSearch, onRandomUser }: SearchFormProps) {
   const [selectedPreferences, setSelectedPreferences] = useState<number[]>([]);
   const [selectedRelationships, setSelectedRelationships] = useState<number[]>([]);
   const [selectedAgeRanges, setSelectedAgeRanges] = useState<number[]>([]);
@@ -83,7 +84,24 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
       ageRanges: selectedAgeRanges,
     });
   };
-  
+
+  const handleRandomUser = async () => {
+    try {
+      const response = await fetch('/api/users/random-user', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch random user');
+      }
+
+      const randomUser = await response.json();
+      onRandomUser(randomUser); // Przekazujemy wylosowanego użytkownika do parenta
+    } catch (error) {
+      console.error('Error fetching random user:', error);
+    }
+  };
+
   return (
     <div className="px-4">
       {/* Preferences Selection */}
@@ -145,6 +163,14 @@ export default function SearchForm({ onSearch }: SearchFormProps) {
         className="text-sm mt-4 w-full px-4 py-2 rounded bg-[#462B20] text-white transition duration-300 items-center"
       >
         Let's go
+      </button>
+
+      {/* Random User Button */}
+      <button
+        onClick={handleRandomUser}
+        className="text-sm mt-2 w-full px-4 py-2 rounded bg-[#4A8C5D] text-white transition duration-300 items-center"
+      >
+        Get Random User
       </button>
     </div>
   );

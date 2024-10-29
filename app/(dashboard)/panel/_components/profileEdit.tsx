@@ -296,7 +296,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
           Update Profile
         </button>
       </form>
-      <ToastContainer position="bottom-right" autoClose={5000} />
+      <ToastContainer position="bottom-right" autoClose={3000} />
     </>
   );
 };
