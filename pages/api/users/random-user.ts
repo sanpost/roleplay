@@ -3,14 +3,39 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+async function getCurrentUserProfileId(req: NextApiRequest): Promise<number | null> {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/users/current-user`, {
+      headers: {
+        Cookie: req.headers.cookie || "", // Pass cookies for authentication
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Failed to fetch current user profile_id");
+      return null;
+    }
+
+    const data = await response.json();
+    return data.profile_id;
+  } catch (error) {
+    console.error("Error fetching current user profile_id:", error);
+    return null;
+  }
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
     try {
+      const currentUserProfileId = await getCurrentUserProfileId(req);
       // Fetch all profiles from the database
       const profiles = await prisma.profile.findMany({
+        where: {
+          id: currentUserProfileId !== null ? { not: currentUserProfileId } : undefined,
+        },
         include: {
           user: true,
           preferences: { include: { preference: true } },
@@ -19,6 +44,7 @@ export default async function handler(
           contactMethods: { include: { contactMethod: true } },
         },
       });
+      
 
       // Check if profiles are found
       if (profiles.length === 0) {

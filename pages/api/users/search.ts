@@ -3,21 +3,44 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+async function getCurrentUserProfileId(req: NextApiRequest): Promise<number | null> {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/users/current-user`, {
+      headers: {
+        Cookie: req.headers.cookie || "", // Pass cookies for authentication
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Failed to fetch current user profile_id");
+      return null;
+    }
+
+    const data = await response.json();
+    return data.profile_id;
+  } catch (error) {
+    console.error("Error fetching current user profile_id:", error);
+    return null;
+  }
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
-    const { preferences, relationships, ageRanges, currentUserId } = req.body;
+    const { preferences, relationships, ageRanges } = req.body;
 
-    console.log("Incoming request data:", { preferences, relationships, ageRanges, currentUserId });
+    console.log("Incoming request data:", { preferences, relationships, ageRanges });
 
     try {
       const conditions: any[] = [];
 
-      // Condition to exclude the current user
-      if (currentUserId) {
+      // Get the current user's profile_id
+      const currentUserProfileId = await getCurrentUserProfileId(req);
+
+      if (currentUserProfileId) {
         conditions.push({
-          userId: { not: currentUserId }, // Exclude current user
+          id: { not: currentUserProfileId }, // Exclude the logged-in user's profile
         });
-        console.log("Exclusion condition for current user added.");
+        console.log("Exclusion condition for current user profile_id added.");
       }
 
       if (preferences && preferences.length > 0) {
@@ -66,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       });
 
-      // Transformacja wyników dla komponentu `UserList`
+      // Transform the results for the `UserList`
       const users = profiles.map((profile) => ({
         id: profile.id,
         user: {
