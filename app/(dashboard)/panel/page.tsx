@@ -10,7 +10,7 @@ export default function Dashboard() {
 
   return (
     <div className="container w-full mx-auto px-4">
-      <h1 className="text-center text-4xl font-pacifico mb-5">Welcome to your Profile Panel</h1>
+      <h1 className="text-center text-3xl font-pacifico mb-5">Welcome to your Profile Panel</h1>
       <ProfileEditForm email={email ?? ''}/>
     </div>
   );

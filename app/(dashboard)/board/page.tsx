@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import SearchForm from "./_components/form-search";
 import UserList from "./_components/user-list";
+import { Footer } from "@/app/_components/footer";
 
 // Define the User interface
 interface User {
@@ -63,22 +64,23 @@ export default function CatalogPage() {
 
   return (
     <div className="w-full h-full flex flex-col overflow-hidden">
-      <ToastContainer position="bottom-right" />
+      <ToastContainer position="bottom-right" autoClose={3000} />
       <h1 className="text-center text-2xl font-pacifico">Bored? Find someone!</h1>
       <div className="flex flex-row h-full w-full overflow-hidden">
-        <div className="xl:w-1/2 w-3/5 flex-shrink-0 overflow-auto">
-          <div className="sticky top-0 z-10">
-            <SearchForm onSearch={handleSearch} onRandomUser={handleRandomUser} />
-          </div>
-        </div>
-        <div className="xl:w-1/2 w-2/5 h-full overflow-auto mt-2">
-          <div className="flex flex-col">
-            <div className="flex-grow overflow-auto p-6">
-              <UserList users={users} />
-            </div>
-          </div>
+      <div className="xl:w-1/2 w-3/5 flex-shrink-0 overflow-auto">
+        <div className="sticky top-0 z-10">
+        <SearchForm onSearch={handleSearch} onRandomUser={handleRandomUser} />
         </div>
       </div>
+      <div className="xl:w-1/2 w-2/5 h-full overflow-auto mt-2 border-l-4 border-dotted border-orange-950">
+        <div className="flex flex-col">
+        <div className="flex-grow overflow-auto p-6">
+          <UserList users={users} />
+        </div>
+        </div>
+      </div>
+      </div>
+      <Footer />
     </div>
   );
 }

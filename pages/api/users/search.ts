@@ -3,17 +3,22 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
-    const { preferences, relationships, ageRanges } = req.body;
+    const { preferences, relationships, ageRanges, currentUserId } = req.body;
 
-    console.log("Incoming request data:", { preferences, relationships, ageRanges });
+    console.log("Incoming request data:", { preferences, relationships, ageRanges, currentUserId });
 
     try {
       const conditions: any[] = [];
+
+      // Condition to exclude the current user
+      if (currentUserId) {
+        conditions.push({
+          userId: { not: currentUserId }, // Exclude current user
+        });
+        console.log("Exclusion condition for current user added.");
+      }
 
       if (preferences && preferences.length > 0) {
         conditions.push({

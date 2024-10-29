@@ -33,7 +33,7 @@ export default function UserList({ users }: UserListProps) {
   };
 
   if (!Array.isArray(users) || users.length === 0) {
-    return <p className="text-center text-gray-500">No users found.</p>;
+    return <p className="text-center font-pacifico mt-32 text-4xl text-orange-950">Try find someone...</p>;
   }
 
   return (

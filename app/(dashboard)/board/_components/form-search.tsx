@@ -158,20 +158,22 @@ export default function SearchForm({ onSearch, onRandomUser }: SearchFormProps) 
         </div>
       </div>
 
-      <button
-        onClick={handleSearch}
-        className="text-sm mt-4 w-full px-4 py-2 rounded bg-[#462B20] text-white transition duration-300 items-center"
-      >
-        Let's go
-      </button>
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={handleSearch}
+          className="text-sm w-1/2 px-4 py-2 rounded bg-orange-950/90 text-white transition duration-300 items-center mr-2 hover:bg-orange-950/95"
+        >
+          🚀 Let's go 🚀
+        </button>
 
-      {/* Random User Button */}
-      <button
-        onClick={handleRandomUser}
-        className="text-sm mt-2 w-full px-4 py-2 rounded bg-[#4A8C5D] text-white transition duration-300 items-center"
-      >
-        Get Random User
-      </button>
+        {/* Random User Button */}
+        <button
+          onClick={handleRandomUser}
+          className="text-sm w-1/2 px-4 py-2 rounded bg-orange-950/70  text-white transition duration-300 items-center ml-2 hover:bg-orange-950/75"
+        >
+          ✨ Get Random User ✨
+        </button>
+      </div>
     </div>
   );
 }

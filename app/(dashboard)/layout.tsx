@@ -17,7 +17,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         >
           <div className="flex-1 overflow-auto pt-5 pb-10">{children}</div>
         </div>
-        <Footer />
       </div>
     );
   }
