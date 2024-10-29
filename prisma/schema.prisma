@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) // Unikalny identyfikator
+  google_id String   @unique                      // Unikalny identyfikator Google
+  username  String                         // Unikalna nazwa użytkownika
+  email     String   @unique                      // Unikalny adres e-mail
+  created_at DateTime @default(now())             // Data utworzenia
+  profile   Profile?  @relation                   // Relacja z profilem
+}
+
+// Model dla profili
+model Profile {
+  id             Int      @id @default(autoincrement()) // Unikalny identyfikator profilu
+  user_id        Int      @unique                     // Unikalny identyfikator użytkownika
+  bio            String?  // Opcjonalny opis
+  age            Int?     // Opcjonalny wiek
+  gender         String?  // Opcjonalna płeć
+  preferences       UserPreference[]
+  ageRanges         UserAgeRange[]
+  relationships     UserRelationship[]
+  contactMethods    UserContactMethod[]
+
+  user User @relation(fields: [user_id], references: [id]) // Relacja z użytkownikiem
+}
+
+model Gender {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique // Unikalna nazwa relacji
+}
+
+model Preference {
+  id        Int             @id @default(autoincrement()) // Unikalny identyfikator
+  name      String          // Nazwa preferencji
+  userPrefs UserPreference[] // Relacja do użytkowników, którzy mają tę preferencję
+}
+
+model UserPreference {
+  id          Int         @id @default(autoincrement()) // Unikalny identyfikator
+  profile_id  Int         // Klucz obcy do profilu
+  preference_id Int        // Klucz obcy do preferencji
+  profile     Profile     @relation(fields: [profile_id], references: [id])
+  preference  Preference  @relation(fields: [preference_id], references: [id])
+}
+
+model UserAgeRange {
+  id          Int         @id @default(autoincrement()) // Unikalny identyfikator
+  profile_id  Int         // Klucz obcy do profilu
+  age_range_id Int        // Klucz obcy do zakresu wiekowego
+  profile     Profile     @relation(fields: [profile_id], references: [id])
+  ageRange    AgeRange    @relation(fields: [age_range_id], references: [id])
+}
+
+model UserRelationship {
+  id          Int         @id @default(autoincrement()) // Unikalny identyfikator
+  profile_id  Int         // Klucz obcy do profilu
+  relationship_id Int     // Klucz obcy do relacji
+  profile     Profile     @relation(fields: [profile_id], references: [id])
+  relationship Relationship @relation(fields: [relationship_id], references: [id])
+}
+
+model UserContactMethod {
+  id          Int         @id @default(autoincrement()) // Unikalny identyfikator
+  profile_id  Int         // Klucz obcy do profilu
+  contact_method_id Int   // Klucz obcy do metody kontaktu
+  profile     Profile     @relation(fields: [profile_id], references: [id])
+  contactMethod ContactMethod @relation(fields: [contact_method_id], references: [id])
+}
+
+// Model dla AgeRange
+model AgeRange {
+  id          Int         @id @default(autoincrement()) // Unikalny identyfikator
+  name        String      // Nazwa zakresu wiekowego
+  userAgeRanges UserAgeRange[] // Relacja do użytkowników w tym zakresie
+}
+
+// Model dla Relationship
+model Relationship {
+  id          Int         @id @default(autoincrement()) // Unikalny identyfikator
+  name        String      // Nazwa relacji
+  userRelationships UserRelationship[] // Relacja do użytkowników w tej relacji
+}
+
+// Model dla ContactMethod
+model ContactMethod {
+  id          Int         @id @default(autoincrement()) // Unikalny identyfikator
+  name        String      // Nazwa metody kontaktu
+  userContactMethods UserContactMethod[] // Relacja do użytkowników korzystających z tej metody
+}
