@@ -15,7 +15,6 @@ export default async function handler(
     try {
       const conditions: any[] = [];
 
-      // Zagnieżdżone warunki dla każdego z filtrów:
       if (preferences && preferences.length > 0) {
         conditions.push({
           preferences: {
@@ -49,38 +48,35 @@ export default async function handler(
         console.log("Age ranges condition added.");
       }
 
-      // Log final conditions for query
       console.log("Final conditions for query:", conditions);
 
-      // Wyszukiwanie profili z dopasowanymi warunkami
-      const users = await prisma.profile.findMany({
+      const profiles = await prisma.profile.findMany({
         where: conditions.length > 0 ? { AND: conditions } : {},
         include: {
-          user: true, // Dołącz dane użytkownika
-          preferences: {
-            include: {
-              preference: true,
-            },
-          },
-          relationships: {
-            include: {
-              relationship: true,
-            },
-          },
-          ageRanges: {
-            include: {
-              ageRange: true,
-            },
-          },
-          contactMethods: {
-            include: {
-              contactMethod: true,
-            },
-          },
+          user: true,
+          preferences: { include: { preference: true } },
+          relationships: { include: { relationship: true } },
+          ageRanges: { include: { ageRange: true } },
+          contactMethods: { include: { contactMethod: true } },
         },
       });
 
-      console.log("Users retrieved from database:", users);
+      // Transformacja wyników dla komponentu `UserList`
+      const users = profiles.map((profile) => ({
+        id: profile.id,
+        user: {
+          username: profile.user.username,
+        },
+        bio: profile.bio,
+        age: profile.age,
+        gender: profile.gender,
+        preferences: profile.preferences.map((pref) => pref.preference.name),
+        relationships: profile.relationships.map((rel) => rel.relationship.name),
+        ageRanges: profile.ageRanges.map((range) => range.ageRange.name),
+        contact_methods: profile.contactMethods.map((method) => method.contactMethod.name),
+      }));
+
+      console.log("Transformed users data:", JSON.stringify(users, null, 2));
 
       res.status(200).json(users);
     } catch (error) {

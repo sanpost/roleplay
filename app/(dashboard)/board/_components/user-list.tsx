@@ -7,11 +7,11 @@ interface User {
   };
   bio: string;
   age: number;
-  preferences: string[]; // Tablica stringów
-  relationships: string[]; // Tablica stringów
-  ageRanges: string[]; // Tablica stringów
   gender: string;
-  contact_methods: string[]; // Tablica stringów
+  preferences: string[]; // Teraz jako tablica stringów
+  relationships: string[];
+  ageRanges: string[];
+  contact_methods: string[];
 }
 
 interface UserListProps {
@@ -65,16 +65,28 @@ export default function UserList({ users }: UserListProps) {
             <p className="text-gray-600">Age: {selectedUser.age}</p>
             <p className="text-gray-600">Gender: {selectedUser.gender}</p>
             <p className="text-gray-600">
-              Preferences: {selectedUser.preferences?.join(", ") || "None"}
+              Preferences:{" "}
+              {selectedUser.preferences.length > 0
+                ? selectedUser.preferences.join(", ")
+                : "None"}
             </p>
             <p className="text-gray-600">
-              Relationships: {selectedUser.relationships?.join(", ") || "None"}
+              Relationships:{" "}
+              {selectedUser.relationships.length > 0
+                ? selectedUser.relationships.join(", ")
+                : "None"}
             </p>
             <p className="text-gray-600">
-              Age Ranges: {selectedUser.ageRanges?.join(", ") || "None"}
+              Age Ranges:{" "}
+              {selectedUser.ageRanges.length > 0
+                ? selectedUser.ageRanges.join(", ")
+                : "None"}
             </p>
             <p className="text-gray-600">
-              Contact with Me: {selectedUser.contact_methods?.join(", ") || "None"}
+              Contact with Me:{" "}
+              {selectedUser.contact_methods.length > 0
+                ? selectedUser.contact_methods.join(", ")
+                : "None"}
             </p>
             <button
               className="mt-4 bg-blue-500 text-white rounded-lg px-4 py-2"
