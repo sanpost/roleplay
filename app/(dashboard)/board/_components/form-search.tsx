@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Loader from './loader';
 
 interface Preference {
   id: number;
@@ -28,10 +29,14 @@ export default function SearchForm({ onSearch, onRandomUser }: SearchFormProps) 
   const [availableRelationships, setAvailableRelationships] = useState<Relationship[]>([]);
   const [availableAgeRanges, setAvailableAgeRanges] = useState<AgeRange[]>([]);
 
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Dodajemy stan isLoading
+
   // Fetch options from the API
   useEffect(() => {
     async function fetchData() {
       try {
+        setIsLoading(true);
+
         const [prefsRes, relRes, ageRes] = await Promise.all([
           fetch('/api/preferences'),
           fetch('/api/relationships'),
@@ -47,6 +52,8 @@ export default function SearchForm({ onSearch, onRandomUser }: SearchFormProps) 
         setAvailableAgeRanges(ageRangesData);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false); // Ustawiamy isLoading na false po zakończeniu pobierania
       }
     }
 
@@ -102,6 +109,11 @@ export default function SearchForm({ onSearch, onRandomUser }: SearchFormProps) 
     }
   };
 
+  if (isLoading) {
+    // Wyświetlamy loader podczas ładowania danych
+    return <Loader />;
+  }
+  
   return (
     <div className="px-4">
       {/* Preferences Selection */}

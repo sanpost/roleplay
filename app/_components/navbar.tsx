@@ -1,9 +1,10 @@
 import React from "react";
 import Login from "./login";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export const Navbar = () => {
   const router = useRouter();
+  const currentRoute = usePathname(); // Get the current path
 
   const handleBoard = () => {
     router.push("/board");
@@ -24,13 +25,21 @@ export const Navbar = () => {
       <div className="flex-grow flex space-x-4">
         <button
           onClick={handleBoard}
-          className="text-neutral-700 text-lg py-2 px-4 rounded hover:bg-neutral-200 transition font-pacifico"
+          className={`text-lg py-2 px-4 rounded transition font-pacifico ${
+            currentRoute === "/board"
+              ? "text-neutral-900 bg-neutral-200" // Active state styles
+              : "text-neutral-700 hover:bg-neutral-200"
+          }`}
         >
           Catalog
         </button>
         <button
           onClick={handleProfile}
-          className="text-neutral-700 text-lg py-2 px-4 rounded hover:bg-neutral-200 transition font-pacifico"
+          className={`text-lg py-2 px-4 rounded transition font-pacifico ${
+            currentRoute === "/panel"
+              ? "text-neutral-900 bg-neutral-200" // Active state styles
+              : "text-neutral-700 hover:bg-neutral-200"
+          }`}
         >
           Your Profile
         </button>

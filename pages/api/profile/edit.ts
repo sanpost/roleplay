@@ -1,21 +1,53 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
+import { NextApiRequest, NextApiResponse } from "next";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'PUT') {
-    const { email, username, bio, age, preferences, age_range, relationship, gender, contact_methods } = req.body;
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method === "PUT") {
+    const {
+      email,
+      username,
+      bio,
+      age,
+      preferences,
+      age_range,
+      relationship,
+      gender,
+      contact_methods,
+    } = req.body;
 
     // Validate required fields
     if (!email || !username) {
-      return res.status(400).json({ message: 'Email and username are required' });
+      return res
+        .status(400)
+        .json({ message: "Email and username are required" });
     }
 
     // Sanitize bio to prevent SQL Injection and other harmful scripts
     const bioRegex = /[<>\/\\\[\]{}();]/; // Simple regex to find dangerous characters
     if (bioRegex.test(bio)) {
-      return res.status(400).json({ message: 'Bio contains invalid characters!' });
+      return res
+        .status(400)
+        .json({ message: "Bio contains invalid characters!" });
+    }
+    // Walidacja i sanitacja odnośników metod kontaktu
+    if (contact_methods) {
+      const contactLinkRegex = /[<>\/\\\[\]{}();]/; // Prosta walidacja na niebezpieczne znaki
+      for (const cm of contact_methods) {
+        if (
+          typeof cm.id !== "number" ||
+          typeof cm.link !== "string" ||
+          contactLinkRegex.test(cm.link)
+        ) {
+          return res
+            .status(400)
+            .json({ message: "Invalid contact method data!" });
+        }
+      }
     }
 
     // Optional fields
@@ -27,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
 
       // Use a transaction to ensure all changes are applied atomically
@@ -43,10 +75,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         // Delete existing relationships
-        await prisma.userPreference.deleteMany({ where: { profile_id: updatedProfile.id } });
-        await prisma.userAgeRange.deleteMany({ where: { profile_id: updatedProfile.id } });
-        await prisma.userRelationship.deleteMany({ where: { profile_id: updatedProfile.id } });
-        await prisma.userContactMethod.deleteMany({ where: { profile_id: updatedProfile.id } });
+        await prisma.userPreference.deleteMany({
+          where: { profile_id: updatedProfile.id },
+        });
+        await prisma.userAgeRange.deleteMany({
+          where: { profile_id: updatedProfile.id },
+        });
+        await prisma.userRelationship.deleteMany({
+          where: { profile_id: updatedProfile.id },
+        });
+        await prisma.userContactMethod.deleteMany({
+          where: { profile_id: updatedProfile.id },
+        });
 
         // Map preferences and save
         if (preferences) {
@@ -80,22 +120,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // Map contact methods and save
         if (contact_methods) {
-          await prisma.userContactMethod.createMany({
-            data: contact_methods.map((contactMethodId: number) => ({
-              profile_id: updatedProfile.id,
-              contact_method_id: contactMethodId,
-            })),
-          });
+          // Filtrowanie nieprawidłowych wpisów
+          const validContactMethods = contact_methods.filter(
+            (cm: { id: number; link: string }) =>
+              cm.id !== undefined && cm.link !== undefined && cm.link !== ""
+          );
+        
+          if (validContactMethods.length > 0) {
+            await prisma.userContactMethod.createMany({
+              data: validContactMethods.map((cm: { id: any; link: any; }) => ({
+                profile_id: updatedProfile.id,
+                contact_method_id: cm.id,
+                contactLink: cm.link,
+              })),
+            });
+          }
         }
+        
       });
 
-      return res.status(200).json({ message: 'Profile updated successfully' });
+      return res.status(200).json({ message: "Profile updated successfully" });
     } catch (error) {
-      console.error('Error updating profile:', error);
-      return res.status(500).json({ message: 'Internal server error', error: (error as Error).message });
+      console.error("Error updating profile:", error);
+      return res
+        .status(500)
+        .json({
+          message: "Internal server error",
+          error: (error as Error).message,
+        });
     }
   } else {
-    res.setHeader('Allow', ['PUT']);
+    res.setHeader("Allow", ["PUT"]);
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

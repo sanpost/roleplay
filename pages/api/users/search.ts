@@ -7,7 +7,7 @@ async function getCurrentUserProfileId(req: NextApiRequest): Promise<number | nu
   try {
     const response = await fetch(`${process.env.NEXTAUTH_URL}/api/users/current-user`, {
       headers: {
-        Cookie: req.headers.cookie || "", // Pass cookies for authentication
+        Cookie: req.headers.cookie || "", // Przekazanie ciasteczek dla autentykacji
       },
     });
 
@@ -33,12 +33,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const conditions: any[] = [];
 
-      // Get the current user's profile_id
+      // Pobierz profile_id bieżącego użytkownika
       const currentUserProfileId = await getCurrentUserProfileId(req);
 
       if (currentUserProfileId) {
         conditions.push({
-          id: { not: currentUserProfileId }, // Exclude the logged-in user's profile
+          id: { not: currentUserProfileId }, // Wyklucz profil zalogowanego użytkownika
         });
         console.log("Exclusion condition for current user profile_id added.");
       }
@@ -76,8 +76,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log("Age ranges condition added.");
       }
 
-      console.log("Final conditions for query:", conditions);
-
       const profiles = await prisma.profile.findMany({
         where: conditions.length > 0 ? { AND: conditions } : {},
         include: {
@@ -85,11 +83,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           preferences: { include: { preference: true } },
           relationships: { include: { relationship: true } },
           ageRanges: { include: { ageRange: true } },
-          contactMethods: { include: { contactMethod: true } },
+          contactMethods: {
+            include: {
+              contactMethod: true,
+            },
+          },
         },
       });
 
-      // Transform the results for the `UserList`
+      // Transformacja wyników dla `UserList`
       const users = profiles.map((profile) => ({
         id: profile.id,
         user: {
@@ -101,10 +103,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         preferences: profile.preferences.map((pref) => pref.preference.name),
         relationships: profile.relationships.map((rel) => rel.relationship.name),
         ageRanges: profile.ageRanges.map((range) => range.ageRange.name),
-        contact_methods: profile.contactMethods.map((method) => method.contactMethod.name),
+        contact_methods: profile.contactMethods.map((method) => ({
+          name: method.contactMethod.name,
+          link: method.contactLink,
+        })),
       }));
-
-      console.log("Transformed users data:", JSON.stringify(users, null, 2));
 
       res.status(200).json(users);
     } catch (error) {

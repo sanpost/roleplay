@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "./loader"; 
 
 interface ProfileEditFormProps {
   email: string;
+}
+
+interface ContactMethodData {
+  id: number;
+  link: string;
 }
 
 interface FormData {
@@ -13,7 +19,7 @@ interface FormData {
   gender: string;
   ageRange: number[]; // Should be an array of numbers (IDs)
   relationship: number[]; // Should be an array of numbers (IDs)
-  contactMethod: number[]; // Should be an array of numbers (IDs)
+  contactMethod: ContactMethodData[]; // Should be an array of objects with id and link
   preferences: number[]; // Should be an array of numbers (IDs)
 }
 
@@ -37,9 +43,14 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
     genderList: [] as string[],
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+
+        setIsLoading(true);
+        
         const response = await fetch(`/api/profile/${email}`);
         const data = await response.json();
 
@@ -49,7 +60,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
           const preferencesIds = profile.preferences || [];
           const ageRangeIds = profile.age_range || [];
           const relationshipIds = profile.relationship || [];
-          const contactMethodIds = profile.contact_methods || [];
+          const contactMethodData = profile.contact_methods || []; 
 
           setFormData({
             username,
@@ -58,7 +69,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
             gender: profile?.gender || "",
             ageRange: ageRangeIds,
             relationship: relationshipIds,
-            contactMethod: contactMethodIds,
+            contactMethod: contactMethodData,
             preferences: preferencesIds,
           });
 
@@ -86,11 +97,54 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
   }, [email]);
+
+  const handleContactMethodCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: number
+  ) => {
+    const { checked } = e.target;
+    setFormData((prev) => {
+      let updatedContactMethods = [...prev.contactMethod];
+      if (checked) {
+        if (!updatedContactMethods.some((cm) => cm.id === id)) {
+          updatedContactMethods.push({ id, link: "" });
+        }
+      } else {
+        updatedContactMethods = updatedContactMethods.filter((cm) => cm.id !== id);
+      }
+      console.log("Updated Contact Methods:", updatedContactMethods);
+      return {
+        ...prev,
+        contactMethod: updatedContactMethods,
+      };
+    });
+  };
+  
+  const handleContactLinkChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: number
+  ) => {
+    const { value } = e.target;
+    setFormData((prev) => {
+      const updatedContactMethods = prev.contactMethod.map((cm) => {
+        if (cm.id === id) {
+          return { ...cm, link: value };
+        }
+        return cm;
+      });
+      return {
+        ...prev,
+        contactMethod: updatedContactMethods,
+      };
+    });
+  };
 
   const handleCheckboxChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -119,7 +173,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
       [name]: value,
     }));
   };
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -136,6 +190,19 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
       return; // Zatrzymuje dalszą logikę
     }
 
+    const validContactMethods = formData.contactMethod.filter(
+      (cm) => cm.id !== undefined && cm.link !== undefined
+    );
+  
+    // Walidacja odnośników metod kontaktu
+    const contactLinkRegex = /[<>\/\\\[\]{}();]/;
+    for (const cm of validContactMethods) {
+      if (contactLinkRegex.test(cm.link)) {
+        toast.error("Contact link contains invalid characters!");
+        return;
+      }
+    }
+
     const response = await fetch("/api/profile/edit", {
       method: "PUT",
       headers: {
@@ -145,7 +212,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
         email,
         age_range: formData.ageRange,
         relationship: formData.relationship,
-        contact_methods: formData.contactMethod,
+        contact_methods: validContactMethods,
         preferences: formData.preferences,
         username: formData.username,
         bio: formData.bio,
@@ -161,6 +228,45 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
       toast.error(`Failed to update profile: ${errorData.message}`);
     }
   };
+
+  const renderContactMethods = () => (
+    <div className="mb-4">
+      <span className="block text-sm font-medium text-gray-700">Contact Methods</span>
+      <div className="flex flex-col">
+        {options.contactMethodList.map((option) => {
+          // Sprawdź, czy metoda kontaktu jest wybrana
+          const selectedMethod = formData.contactMethod.find((cm) => cm.id === option.id);
+          const isChecked = !!selectedMethod;
+      
+          return (
+            <div key={option.id} className="mt-2">
+              <label className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  value={option.id}
+                  checked={isChecked}
+                  onChange={(e) => handleContactMethodCheckboxChange(e, option.id)}
+                  className="form-checkbox text-indigo-600"
+                />
+                <span className="ml-2">{option.name}</span>
+              </label>
+              {isChecked && (
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    value={selectedMethod.link}
+                    onChange={(e) => handleContactLinkChange(e, option.id)}
+                    placeholder={`Enter your ${option.name} username/link`}
+                    className="p-2 block w-full border border-gray-500 rounded-md shadow-sm focus:border-indigo-600 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   const renderCheckboxGroup = (
     label: string,
@@ -188,6 +294,11 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
     </div>
   );
 
+  if (isLoading) {
+    // Wyświetlamy loader podczas ładowania danych
+    return <Loader />;
+  }
+  
   return (
     <>
       <form
@@ -247,12 +358,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
               </select>
             </div>
             <div>
-              {renderCheckboxGroup(
-                "Contact Methods",
-                "contactMethod",
-                formData.contactMethod,
-                options.contactMethodList
-              )}
+              {renderContactMethods()}
             </div>
           </div>
 

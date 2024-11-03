@@ -7,29 +7,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { email } = req.query;
 
   if (req.method === 'GET') {
-    // Validate that email is provided
+    // Walidacja adresu email
     if (!email || typeof email !== 'string') {
       return res.status(400).json({ message: 'Invalid or missing email' });
     }
 
     try {
-      // Find the user by email
+      // Znajdź użytkownika na podstawie email
       const user = await prisma.user.findUnique({
         where: { email: email },
         include: { profile: true },
       });
 
-      // Check if the user exists
+      // Sprawdź, czy użytkownik istnieje
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Fetch user's profile data
+      // Pobierz dane profilu użytkownika
       const profile = await prisma.profile.findUnique({
         where: { user_id: user.id },
       });
 
-      // Fetch user's preferences, age ranges, relationships, and contact methods using relational tables
+      // Pobierz preferencje, przedziały wiekowe, relacje i metody kontaktu użytkownika
       const userPreferences = await prisma.userPreference.findMany({
         where: { profile_id: profile?.id },
         select: { preference_id: true },
@@ -47,21 +47,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const userContactMethods = await prisma.userContactMethod.findMany({
         where: { profile_id: profile?.id },
-        select: { contact_method_id: true },
+        select: {
+          contact_method_id: true,
+          contactLink: true,
+        },
       });
 
-      // Fetch lists of preferences, age ranges, relationships, genders, and contact methods
+      // Pobierz listy preferencji, przedziałów wiekowych, relacji, płci i metod kontaktu
       const preferences = await prisma.preference.findMany();
       const ageRanges = await prisma.ageRange.findMany();
       const relationships = await prisma.relationship.findMany();
       const genders = await prisma.gender.findMany();
       const contactMethods = await prisma.contactMethod.findMany();
 
-      // Extract IDs from user-specific tables
-      const preferenceIds = userPreferences.map(up => up.preference_id);
-      const ageRangeIds = userAgeRanges.map(uar => uar.age_range_id);
-      const relationshipIds = userRelationships.map(ur => ur.relationship_id);
-      const contactMethodIds = userContactMethods.map(ucm => ucm.contact_method_id);
+      // Wyciągnij identyfikatory z tabel użytkownika
+      const preferenceIds = userPreferences.map((up) => up.preference_id);
+      const ageRangeIds = userAgeRanges.map((uar) => uar.age_range_id);
+      const relationshipIds = userRelationships.map((ur) => ur.relationship_id);
+
+      // Dla metod kontaktu pobierz zarówno id, jak i link
+      const contactMethodsData = userContactMethods.map((ucm) => ({
+        id: ucm.contact_method_id,
+        link: ucm.contactLink || "",
+      }));
 
       return res.status(200).json({
         user: {
@@ -74,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             preferences: preferenceIds,
             age_range: ageRangeIds,
             relationship: relationshipIds,
-            contact_methods: contactMethodIds,
+            contact_methods: contactMethodsData,
           },
         },
         preferences,

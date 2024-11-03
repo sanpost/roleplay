@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import Loader from "./loader"; // Adjust the path as necessary
+
+interface ContactMethod {
+  name: string;
+  link: string;
+}
 
 interface User {
   id: number;
@@ -11,14 +17,15 @@ interface User {
   preferences: string[];
   relationships: string[];
   ageRanges: string[];
-  contact_methods: string[];
+  contact_methods: ContactMethod[];
 }
 
 interface UserListProps {
   users: User[];
+  isLoading: boolean; // Dodano prop isLoading
 }
 
-export default function UserList({ users }: UserListProps) {
+export default function UserList({ users, isLoading }: UserListProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -32,8 +39,18 @@ export default function UserList({ users }: UserListProps) {
     setSelectedUser(null);
   };
 
+  if (isLoading) {
+    // Wyświetlamy loader podczas ładowania danych
+    return <Loader />;
+  }
+  
+
   if (!Array.isArray(users) || users.length === 0) {
-    return <p className="text-center font-pacifico mt-32 text-4xl text-orange-950">try to find someone...</p>;
+    return (
+      <p className="text-center font-pacifico mt-32 text-4xl text-orange-950">
+        Brak użytkowników do wyświetlenia.
+      </p>
+    );
   }
 
   return (
@@ -71,13 +88,22 @@ export default function UserList({ users }: UserListProps) {
             <p className="text-gray-600 mb-2">Age: {selectedUser.age}</p>
             <p className="text-gray-600 mb-2">Gender: {selectedUser.gender}</p>
             <p className="text-gray-600 mb-2">
-              Preferences: {selectedUser.preferences.length > 0 ? selectedUser.preferences.join(", ") : "None"}
+              Preferences:{" "}
+              {selectedUser.preferences.length > 0
+                ? selectedUser.preferences.join(", ")
+                : "None"}
             </p>
             <p className="text-gray-600 mb-2">
-              Relationships: {selectedUser.relationships.length > 0 ? selectedUser.relationships.join(", ") : "None"}
+              Relationships:{" "}
+              {selectedUser.relationships.length > 0
+                ? selectedUser.relationships.join(", ")
+                : "None"}
             </p>
             <p className="text-gray-600 mb-2">
-              Age Ranges: {selectedUser.ageRanges.length > 0 ? selectedUser.ageRanges.join(", ") : "None"}
+              Age Ranges:{" "}
+              {selectedUser.ageRanges.length > 0
+                ? selectedUser.ageRanges.join(", ")
+                : "None"}
             </p>
             <div className="mb-2">
               <p className="text-gray-700 mb-2">Contact with Me:</p>
@@ -85,7 +111,7 @@ export default function UserList({ users }: UserListProps) {
                 <ul className="list-disc list-inside text-gray-600 text-base">
                   {selectedUser.contact_methods.map((method, index) => (
                     <li key={index} className="mb-2">
-                      {method}
+                      {method.name}: {method.link}
                     </li>
                   ))}
                 </ul>

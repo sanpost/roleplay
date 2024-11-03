@@ -73,11 +73,12 @@ model UserRelationship {
 }
 
 model UserContactMethod {
-  id          Int         @id @default(autoincrement()) // Unikalny identyfikator
-  profile_id  Int         // Klucz obcy do profilu
-  contact_method_id Int   // Klucz obcy do metody kontaktu
-  profile     Profile     @relation(fields: [profile_id], references: [id])
-  contactMethod ContactMethod @relation(fields: [contact_method_id], references: [id])
+  id                Int         @id @default(autoincrement())
+  profile_id        Int         // Foreign key to the profile
+  contact_method_id Int         // Foreign key to the contact method
+  profile           Profile     @relation(fields: [profile_id], references: [id])
+  contactMethod     ContactMethod @relation(fields: [contact_method_id], references: [id])
+  contactLink       String?     // Optional link or nickname for contact method
 }
 
 // Model dla AgeRange
