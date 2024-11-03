@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "./loader"; 
+import DeleteButton from "./delete-button";
+import { signOut } from "next-auth/react"; 
+import { useRouter } from "next/router";
 
 interface ProfileEditFormProps {
   email: string;
@@ -24,6 +27,7 @@ interface FormData {
 }
 
 const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
+
   const [formData, setFormData] = useState<FormData>({
     username: "",
     bio: "",
@@ -294,8 +298,35 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
     </div>
   );
 
+  const handleDeleteAccount = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+  
+    if (confirmDelete) {
+      const response = await fetch("/api/profile/delete-user", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }), // Zakładam, że `email` jest dostępny
+      });
+  
+      if (response.ok) {
+        toast.success("Account deleted successfully!");
+  
+        await signOut({ redirect: false });
+
+      } else {
+        const errorData = await response.json();
+        toast.error(`Failed to delete account: ${errorData.message}`);
+      }
+    }
+  };
+
   if (isLoading) {
-    // Wyświetlamy loader podczas ładowania danych
     return <Loader />;
   }
   
@@ -358,7 +389,10 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ email }) => {
               </select>
             </div>
             <div>
-              {renderContactMethods()}
+              {renderContactMethods()} 
+            </div>
+            <div className="w-full">
+            <DeleteButton onDelete={handleDeleteAccount} />
             </div>
           </div>
 
