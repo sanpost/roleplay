@@ -8,8 +8,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// provider = "mysql"
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -29,11 +30,11 @@ model User {
 
 // Model dla profili
 model Profile {
-  id             Int      @id @default(autoincrement()) // Unikalny identyfikator profilu
-  user_id        Int      @unique                     // Unikalny identyfikator użytkownika
-  bio            String?  // Opcjonalny opis
-  age            Int?     // Opcjonalny wiek
-  gender         String?  // Opcjonalna płeć
+  id                Int      @id @default(autoincrement()) // Unikalny identyfikator profilu
+  user_id           Int      @unique                     // Unikalny identyfikator użytkownika
+  bio               String?  // Opcjonalny opis
+  age               Int?     // Opcjonalny wiek
+  gender            String?  // Opcjonalna płeć
   preferences       UserPreference[]
   ageRanges         UserAgeRange[]
   relationships     UserRelationship[]
