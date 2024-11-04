@@ -4,7 +4,6 @@ import "react-toastify/dist/ReactToastify.css";
 import Loader from "./loader"; 
 import DeleteButton from "./delete-button";
 import { signOut } from "next-auth/react"; 
-import { useRouter } from "next/router";
 
 interface ProfileEditFormProps {
   email: string;

@@ -6,7 +6,7 @@ import { Navbar } from "../_components/navbar";
 import { redirect } from "next/navigation";
 
 const MarketingLayout = ({ children }: { children: React.ReactNode }) => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   if (!session) {
     return (

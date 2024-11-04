@@ -32,8 +32,8 @@ export default NextAuth({
         });
 
         // Zaczynamy od nazwy użytkownika z Google
-        let username = name; 
-        let usernameExists = false; // Ustalamy, że nazwa użytkownika nie jest unikalna
+        const username = name; // Zmieniamy let na const
+        // let usernameExists = false; // Możesz usunąć tę zmienną, jeśli nie jest używana
 
         if (existingUser) {
           // Użytkownik już istnieje, aktualizujemy jego Google ID

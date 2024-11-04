@@ -175,7 +175,7 @@ export default function SearchForm({ onSearch, onRandomUser }: SearchFormProps) 
           onClick={handleSearch}
           className="text-sm w-1/2 px-4 py-2 rounded bg-orange-950/90 text-white transition duration-300 items-center mr-2 hover:bg-orange-950/95"
         >
-          🚀 Let's go 🚀
+          🚀 Let&apos;s go 🚀  {/* Zmiana z ' na &apos; */}
         </button>
 
         {/* Random User Button */}
