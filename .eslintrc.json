@@ -1,9 +1,7 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"],
+  "extends": ["next/core-web-vitals", "next/typescript", "prettier", "next"],
   "rules": {
-    "@typescript-eslint/no-explicit-any": "off", // Wyłącza regułę dotyczącą użycia 'any'
-    "@typescript-eslint/no-unused-vars": "warn", // Ustawia ostrzeżenie dla nieużywanych zmiennych
-    "react/no-unescaped-entities": "warn", // Ustawia ostrzeżenie dla nieescapowanych znaków
-    "prefer-const": "warn" // Ustawia ostrzeżenie dla użycia 'let' tam, gdzie można użyć 'const'
+    "react/no-unescaped-entities": "off",
+    "@next/next/no-page-custom-font": "off"
   }
 }
