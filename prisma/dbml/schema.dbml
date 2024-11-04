@@ -1,0 +1,105 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  google_id String [unique, not null]
+  username String [not null]
+  email String [unique, not null]
+  created_at DateTime [default: `now()`, not null]
+  profile Profile
+}
+
+Table Profile {
+  id Int [pk, increment]
+  user_id Int [unique, not null]
+  bio String
+  age Int
+  gender String
+  preferences UserPreference [not null]
+  ageRanges UserAgeRange [not null]
+  relationships UserRelationship [not null]
+  contactMethods UserContactMethod [not null]
+  user User [not null]
+}
+
+Table Gender {
+  id Int [pk, increment]
+  name String [unique, not null]
+}
+
+Table Preference {
+  id Int [pk, increment]
+  name String [not null]
+  userPrefs UserPreference [not null]
+}
+
+Table UserPreference {
+  id Int [pk, increment]
+  profile_id Int [not null]
+  preference_id Int [not null]
+  profile Profile [not null]
+  preference Preference [not null]
+}
+
+Table UserAgeRange {
+  id Int [pk, increment]
+  profile_id Int [not null]
+  age_range_id Int [not null]
+  profile Profile [not null]
+  ageRange AgeRange [not null]
+}
+
+Table UserRelationship {
+  id Int [pk, increment]
+  profile_id Int [not null]
+  relationship_id Int [not null]
+  profile Profile [not null]
+  relationship Relationship [not null]
+}
+
+Table UserContactMethod {
+  id Int [pk, increment]
+  profile_id Int [not null]
+  contact_method_id Int [not null]
+  profile Profile [not null]
+  contactMethod ContactMethod [not null]
+  contactLink String
+}
+
+Table AgeRange {
+  id Int [pk, increment]
+  name String [not null]
+  userAgeRanges UserAgeRange [not null]
+}
+
+Table Relationship {
+  id Int [pk, increment]
+  name String [not null]
+  userRelationships UserRelationship [not null]
+}
+
+Table ContactMethod {
+  id Int [pk, increment]
+  name String [not null]
+  userContactMethods UserContactMethod [not null]
+}
+
+Ref: Profile.user_id - User.id
+
+Ref: UserPreference.profile_id > Profile.id
+
+Ref: UserPreference.preference_id > Preference.id
+
+Ref: UserAgeRange.profile_id > Profile.id
+
+Ref: UserAgeRange.age_range_id > AgeRange.id
+
+Ref: UserRelationship.profile_id > Profile.id
+
+Ref: UserRelationship.relationship_id > Relationship.id
+
+Ref: UserContactMethod.profile_id > Profile.id
+
+Ref: UserContactMethod.contact_method_id > ContactMethod.id
