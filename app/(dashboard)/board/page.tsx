@@ -53,7 +53,7 @@ export default function CatalogPage() {
       } catch (error) {
         console.error("Error fetching users:", error);
         setIsLoading(false); // Ustawiamy isLoading na false w przypadku błędu
-        toast.error("Wystąpił błąd podczas pobierania użytkowników. Spróbuj ponownie.");
+        toast.error("An error occurred while retrieving users. Please try again.");
       }
     };
 
@@ -77,18 +77,18 @@ export default function CatalogPage() {
 
       // Check if users were found
       if (!searchData.preferences.length && !searchData.relationships.length && !searchData.ageRanges.length) {
-        toast.info("Nie wybrano kategorii – wyświetlono wszystkich użytkowników.");
+        toast.info("No category selected - all users displayed.");
       } else if (data.length > 0) {
-        toast.success(`Znaleziono ${data.length} pasujących użytkowników!`);
+        toast.success(`${data.length} matching users found!`);
       } else {
-        toast.warn("Brak pasujących użytkowników na podstawie wybranych kategorii.");
+        toast.warn("No matching users based on the selected categories.");
       }
       
       return data; 
     } catch (error) {
       console.error("Error searching users:", error);
       setIsLoading(false); // Ustawiamy isLoading na false w przypadku błędu
-      toast.error("Wystąpił błąd podczas wyszukiwania. Spróbuj ponownie.");
+      toast.error("No matching users based on the selected categories.");
       return []; 
     }
   };
@@ -96,7 +96,7 @@ export default function CatalogPage() {
   const handleRandomUser = (user: User) => {
     setUsers([]);
     setUsers((prevUsers) => [...prevUsers, user]);
-    toast.success(`Wylosowano użytkownika: ${user.user.username}`);
+    toast.success(`User selected: ${user.user.username}`);
   };
 
   return (
