@@ -17,34 +17,28 @@ generator dbml {
   provider = "prisma-dbml-generator"
 }
 
-
+// Model dla użytkownika
 model User {
-  id        Int      @id @default(autoincrement()) // Unikalny identyfikator
-  google_id String   @unique                      // Unikalny identyfikator Google
-  username  String                         // Unikalna nazwa użytkownika
-  email     String   @unique                      // Unikalny adres e-mail
-  created_at DateTime @default(now())             // Data utworzenia
-  profile   Profile?  @relation                   // Relacja z profilem
+  id          Int       @id @default(autoincrement()) // Unikalny identyfikator
+  google_id   String    @unique                       // Unikalny identyfikator Google
+  username    String                                  // Nazwa użytkownika
+  email       String    @unique                       // Unikalny adres e-mail
+  created_at  DateTime  @default(now())               // Data utworzenia
+  profile     Profile?  @relation                     // Relacja z profilem
 }
 
-// Model dla profili
 model Profile {
-  id                Int      @id @default(autoincrement()) // Unikalny identyfikator profilu
-  user_id           Int      @unique                     // Unikalny identyfikator użytkownika
-  bio               String?  // Opcjonalny opis
-  age               Int?     // Opcjonalny wiek
-  gender            String?  // Opcjonalna płeć
-  preferences       UserPreference[]
-  ageRanges         UserAgeRange[]
-  relationships     UserRelationship[]
-  contactMethods    UserContactMethod[]
+  id                Int      @id @default(autoincrement())  // Unikalny identyfikator profilu
+  user_id           Int      @unique                        // Unikalny identyfikator użytkownika
+  bio               String?                                 // Opcjonalny opis
+  age               Int?                                    // Opcjonalny wiek
+  gender            String?                                 // Opcjonalna płeć
+  preferences       UserPreference[]                        // Tablica preferencji
+  ageRanges         UserAgeRange[]                          // Tablica przedziałów wiekowych
+  relationships     UserRelationship[]                      // Tablica typów relacji
+  contactMethods    UserContactMethod[]                     // Tablica metod kontaktu
 
   user User @relation(fields: [user_id], references: [id]) // Relacja z użytkownikiem
-}
-
-model Gender {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique // Unikalna nazwa relacji
 }
 
 model Preference {
